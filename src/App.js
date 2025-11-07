@@ -1,25 +1,46 @@
-import logo from './logo.svg';
-import './App.css';
+// src/App.js
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Login from './components/Login';
+import Register from './components/Register';
+import Dashboard from './components/Dashboard';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <div className="container">
+        <Routes>
+          {/* Rotas Públicas */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          
+          {/* Rota Protegida */}
+          <Route 
+            path="/dashboard" 
+            element={
+              <AuthGuard>
+                <Dashboard />
+              </AuthGuard>
+            } 
+          />
+          
+          {/* Redirecionamento Padrão */}
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        </Routes>
+      </div>
+    </Router>
   );
+}
+
+// Componente simples para proteger rotas
+function AuthGuard({ children }) {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    // Se não há token, redireciona para o login
+    return <Navigate to="/login" replace />;
+  }
+  // Se há token, renderiza o componente filho (Dashboard)
+  return children;
 }
 
 export default App;
